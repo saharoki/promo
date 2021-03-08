@@ -18,6 +18,10 @@ run command: php artisan migrate
 
 make sure that storage/converted directory is writable.
 
+run local server: php -S localhost:8000 -t public
+
+request example: http://localhost:8000/api/mp3/7868687687
+
 ## Improvment
 
 Instead of directly convert mp4 to mp3 the better way to keep convert request in DB/AWS SQS/something else.
