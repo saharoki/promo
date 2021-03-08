@@ -14,4 +14,8 @@ class Converted extends Model
     public function scopeByUrl($query, $url){
         $query->where('url', $url);
     }
+
+    public function scopeByUniqId($query, $uniq){
+        $query->where('uniq_id', $uniq);
+    }
 }

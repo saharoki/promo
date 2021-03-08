@@ -17,6 +17,14 @@ class HtmlParser
         $this->dom = new Dom();
     }
 
+    /**
+     * @param string $category
+     * @return false|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
     public function firstMovieFromCategory(string $category)
     {
         $url = config('param.promoTemplateBaseUrl').$category;
@@ -36,26 +44,16 @@ class HtmlParser
             return false;
         }
         $path = $pathArr[0].'/preview.mp4';
+        $path = str_replace('/collections/', '/promoVideos/', $path);
         $versionArr = explode('?', $pathArr[1]);
         if(array_key_exists(1, $versionArr)){
             $path.='?'.$versionArr[1];
         }
 
-        $succees = true;
         try{
             $response = $client->head($path);
         } catch (\Exception $e) {
-            $succees = false;
-        }
-
-        // file not found in first link
-        if(!$succees){
-            $path = str_replace('/collections/', '/promoVideos/', $path);
-            try{
-                $response = $client->head($path);
-            } catch (\Exception $e) {
-                return false;
-            }
+            return false;
         }
 
         return $path;

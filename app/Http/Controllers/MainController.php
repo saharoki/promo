@@ -6,8 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Facade\Converter;
 use App\Facade\HtmlParser;
+use App\Models\Converted;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MainController extends Controller
 {
@@ -38,5 +41,16 @@ class MainController extends Controller
         if(trim($id) == '') {
             abort(400, 'Required parameter missing');
         }
+
+        //check if file exist
+        $record = Converted::byUniqId($id)->first();
+        if(!$record || !file_exists($record->path)){
+            abort(404, 'file not found');
+        }
+
+       header('Content-Type: application/octet-stream');
+       header("Content-Disposition: attachment; filename=" .basename($record->path));
+       header('Content-Transfer-Encoding: Binary');
+       readfile($record->path);
     }
 }

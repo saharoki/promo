@@ -10,15 +10,25 @@ use FFMpeg\Format\Audio\Mp3;
 class Converter
 {
 
+    /**
+     * @var FFMpeg
+     */
     private  $ffmpeg;
+
     public function __construct()
     {
-        $this->ffmpeg = FFMpeg::create();
+        $this->ffmpeg = FFMpeg::create([
+            'timeout' => 3600
+        ]);
     }
 
+    /**
+     * @param string $url
+     * @return array
+     */
     public function convertMp4ToMp3FromUrl(string $url) : array
     {
-        // check if already converted
+         // check if already converted
         $data = $this->getDataByUrl($url);
         if(!empty($data)){
             return $data;
@@ -27,11 +37,12 @@ class Converter
         $uniq = uniqid();
         $path = storage_path('converted/'.$uniq.'.mp3');
         try {
+            //$video = $this->ffmpeg->open($url);
             $video = $this->ffmpeg->open($url);
-            $audio_format = new Mp3();
-            $video->save($audio_format, $path);
+            $audioFormat = new Mp3();
+            $video->save($audioFormat, $path);
         } catch (\Exception $e) {
-            dd($e);
+            abort(500);
         }
 
         $converted = new Converted();
@@ -43,6 +54,10 @@ class Converter
         return ['id' => $uniq, 'path' => $path];
     }
 
+    /**
+     * @param string $url
+     * @return array
+     */
     public function getDataByUrl(string $url) : array
     {
         $data = [];
