@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Facade\Converter;
 use App\Facade\HtmlParser;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -27,10 +28,9 @@ class MainController extends Controller
         if(!$moviePath){
             abort(404, 'Movie not found');
         }
-        $uniq = uniqid();
 
-        event(new Convert($moviePath, $uniq));
-        return response()->json(['id' => $uniq, 'mp3' => 'http://localhost:8000/api/mp3/'.$uniq]);
+        $data = Converter::convertMp4ToMp3FromUrl($moviePath);
+        return response()->json(['id' => $data['id'], 'mp3' => 'http://localhost:8000/api/mp3/'.$data['id']]);
     }
 
     public function getMp3(Request $request, string $id)
